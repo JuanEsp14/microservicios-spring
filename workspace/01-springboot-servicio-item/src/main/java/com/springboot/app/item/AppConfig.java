@@ -2,14 +2,14 @@ package com.springboot.app.item;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class AppConfig {
 	
 	@Bean(name = "clientRest")
-	public WebClient registrarRestTemplate() {
-		return WebClient.create("http://localhost:8001");
+	public static RestTemplate registrarRestTemplate() {
+		return new RestTemplate();
 	}
 
 }

@@ -7,9 +7,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
 
 import com.springboot.app.item.models.Item;
 import com.springboot.app.item.models.Producto;
@@ -18,21 +17,19 @@ import com.springboot.app.item.models.Producto;
 public class ItemServiceImpl implements ItemService {
 
 	@Autowired
-	private WebClient clientRest;
+	private RestTemplate clientRest;
 	
 	@Override
 	public List<Item> findAll() {
-		WebClient.RequestBodySpec request = clientRest.method(HttpMethod.GET).uri("/listar");
-		List<Producto> productos = Arrays.asList(request.exchange().block().bodyToMono(Producto[].class).block());
-		return productos.stream().map(p -> new Item(p, 1)).collect(Collectors.toList());
+		List<Producto> productos = Arrays.asList(clientRest.getForObject("http://localhost:8001/listar", Producto[].class));
+		return productos.stream().map(producto -> new Item(producto, 1)).collect(Collectors.toList());
 	}
 
 	@Override
 	public Item findById(Long id, Integer cantidad) {
 		Map<String, String> pathVariables = new HashMap<String, String>();
 		pathVariables.put("id", id.toString());
-		WebClient.RequestBodySpec request = clientRest.method(HttpMethod.GET).uri("/ver/{id}", pathVariables);
-		Producto producto = request.exchange().block().bodyToMono(Producto.class).block();
+		Producto producto = clientRest.getForObject("http://localhost:8001/ver/{id}", Producto.class, pathVariables);
 		return new Item(producto, cantidad);
 	}
 
