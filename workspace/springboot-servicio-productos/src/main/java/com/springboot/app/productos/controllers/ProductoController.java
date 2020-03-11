@@ -35,7 +35,7 @@ public class ProductoController {
 	}
 	
 	@GetMapping("/ver/{id}")
-	public Producto detalle(@PathVariable Long id) throws Exception {
+	public Producto detalle(@PathVariable Long id) {
 		Producto producto = productoService.findById(id);
 		//producto.setPort(Integer.parseInt(env.getProperty("local.server.port")));
 		producto.setPort(port);
@@ -44,6 +44,13 @@ public class ProductoController {
 		/**boolean ok = false;
 		if(ok) {
 			throw new Exception("No se encontró el producto");	
+		}*/
+		
+		//Simulamos que el servicio tarda dos segundos en responder
+		/**try {
+			Thread.sleep(2000L);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}*/
 		return producto;
 	}
