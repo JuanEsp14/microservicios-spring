@@ -2,6 +2,7 @@ package com.springboot.app.item;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 //import org.springframework.cloud.netflix.ribbon.RibbonClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -17,6 +18,14 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 //Habilitamos el cliente de Eureka en la app
 @EnableEurekaClient
+
+//Se encarga mediante un hilo separado de la comunicación de los mircroservicios
+//ayuda a controlar las interacciones entre estos servicios distribuidos al agregar 
+//tolerancia a la latencia y lógica de tolerancia a fallas. Hystrix hace esto al aislar 
+//los puntos de acceso entre los servicios, detener las fallas en cascada a través de 
+//ellos y proporcionar opciones de respaldo, todo lo cual mejora la resistencia general 
+//de su sistema.
+@EnableCircuitBreaker
 public class Application {
 
 	public static void main(String[] args) {
