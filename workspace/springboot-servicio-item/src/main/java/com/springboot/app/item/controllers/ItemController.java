@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,10 @@ import com.springboot.app.item.models.Producto;
 import com.springboot.app.item.models.service.ItemService;
 
 @RestController
+
+//Permite actualizar los controladores, componentes, services, etc. donde se 
+//ingresan datos a través de @Valuo o Enviroment
+@RefreshScope
 public class ItemController {
 	
 	private static Logger log = LoggerFactory.getLogger(ItemController.class);
