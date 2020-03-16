@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.springboot.app.item.clientes.ProductoClienteRest;
 import com.springboot.app.item.models.Item;
+import com.springboot.app.item.models.Producto;
 
 //Primary infica que se debe inyectar esta clase y no otra que implemente el service
 //Otra forma de hacerlo es con @Qualifier en el controlador
@@ -27,6 +28,24 @@ public class ItemServiceFeign implements ItemService {
 	@Override
 	public Item findById(Long id, Integer cantidad) {
 		return new Item(clienteFeign.detalle(id), cantidad);
+	}
+
+	@Override
+	public Producto save(Producto producto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Producto update(Producto producto, Long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void delete(Long id) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
