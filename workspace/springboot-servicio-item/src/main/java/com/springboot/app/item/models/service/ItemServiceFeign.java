@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import com.springboot.app.commons.models.entity.Producto;
 import com.springboot.app.item.clientes.ProductoClienteRest;
 import com.springboot.app.item.models.Item;
-import com.springboot.app.item.models.Producto;
 
 //Primary infica que se debe inyectar esta clase y no otra que implemente el service
 //Otra forma de hacerlo es con @Qualifier en el controlador

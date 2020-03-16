@@ -2,6 +2,7 @@ package com.springboot.app.item;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 //import org.springframework.cloud.netflix.ribbon.RibbonClient;
@@ -26,6 +27,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 //ellos y proporcionar opciones de respaldo, todo lo cual mejora la resistencia general 
 //de su sistema.
 @EnableCircuitBreaker
+
+//Configuramos el Entity Scan para que tome las clases que
+//se encuentran en otros paquetes o en otros microservicios
+@EntityScan({"com.springboot.app.commons.models.entity"})
 public class Application {
 
 	public static void main(String[] args) {
