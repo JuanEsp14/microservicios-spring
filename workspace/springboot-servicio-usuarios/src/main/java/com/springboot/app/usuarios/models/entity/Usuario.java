@@ -1,16 +1,22 @@
 package com.springboot.app.usuarios.models.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "usuarios")
 public class Usuario implements Serializable {
 
 	private static final long serialVersionUID = -2685239224698970876L;
@@ -30,6 +36,19 @@ public class Usuario implements Serializable {
 
 	@Column(unique = true, length = 100)
 	private String email;
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+	//Con JoinTable se configuran los campos de la table que genera
+	//la realación entre las dos que utilizan el ManyToMany
+	//Por defecto crea esta configuración sin que se le mencione nada
+	//@JoinTable(name = "usuarios_roles", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "rol_id"))
+	//Se pueden modificar los nombres con las siguientes anotaciones
+	//@JoinTable(name = "usuarios_to_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "rol_id"))
+	//Para generar que un usuario no pueda tener un Rol repetido establecemos
+	//la siguiente notación donde dice que un usuario_id no puede tener el mismo 
+	//rol_id si ya lo contiene
+	@JoinTable(uniqueConstraints = {@UniqueConstraint(columnNames = {"usuario_id", "role_id"})})
+	private List<Rol> roles;
 
 	public Long getId() {
 		return id;
@@ -85,5 +104,13 @@ public class Usuario implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public List<Rol> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Rol> roles) {
+		this.roles = roles;
 	}
 }
