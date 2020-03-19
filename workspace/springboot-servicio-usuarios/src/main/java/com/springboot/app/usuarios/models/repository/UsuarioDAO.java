@@ -10,8 +10,10 @@ import com.springboot.app.usuarios.models.entity.Usuario;
 //funciones de Sort
 
 //Todos los métodos del CRUD son exportados por esta anotación sin necesidad 
-//de escribirlo a mano
-@RepositoryRestResource(path="usuario")
+//de escribirlo a mano de manera HATEOAS -> restricción de la arquitectura API Rest
+//devuelve información en forma de hipervínculo para informarle al usuario cómo debe
+//navegar o interactuar con la app
+@RepositoryRestResource(path="usuarios")
 public interface UsuarioDAO extends PagingAndSortingRepository<Usuario, Long> {
 
 	//Ambos métodos hacen lo mismo, la primera utiliza las propiedades de 

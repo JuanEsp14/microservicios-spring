@@ -47,7 +47,7 @@ public class Usuario implements Serializable {
 	//Para generar que un usuario no pueda tener un Rol repetido establecemos
 	//la siguiente notación donde dice que un usuario_id no puede tener el mismo 
 	//rol_id si ya lo contiene
-	@JoinTable(uniqueConstraints = {@UniqueConstraint(columnNames = {"usuario_id", "role_id"})})
+	@JoinTable(name = "usuarios_roles", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "rol_id"), uniqueConstraints = {@UniqueConstraint(columnNames = {"usuario_id", "rol_id"})})
 	private List<Rol> roles;
 
 	public Long getId() {
