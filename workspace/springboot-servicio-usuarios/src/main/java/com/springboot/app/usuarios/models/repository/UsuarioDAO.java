@@ -6,7 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
-import com.springboot.app.usuarios.models.entity.Usuario;
+import com.springboot.app.commons.usuarios.models.entity.Usuario;
 
 //Paging And Sorting hereda todo de Repository pero le agrega la paginación y 
 //funciones de Sort
