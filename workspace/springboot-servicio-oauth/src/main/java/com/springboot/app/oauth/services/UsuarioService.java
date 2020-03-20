@@ -19,6 +19,8 @@ import com.springboot.app.oauth.clients.UsuarioFeignClient;
 
 //La interface UserDetailsService se encarga de implementar la utenticación
 //del usuario por el username, independiente del JPA, JDC o consumiendo el API REST
+//en este caso utilizamos la comunicación API REST haciendo uso de otro microservicio
+
 //Esta clase debe configurase porque se va a marcar toda la configuración de Spring Security
 @Service
 public class UsuarioService implements UserDetailsService{
