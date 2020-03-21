@@ -29,16 +29,47 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	//Configura el permiso y la seguridad que van a tener nuestros endpoints de OAuth2
+	//tokenKeyAccess se encarga de validar las credenciales que se envían al OAuth2 la idea
+	//es que cualquier cliente pueda acceder
+	//checkTokenAccess validad el token
+	//Estos dos endpoints están protegidos por HTTP Basic utilizando las credenciales del cliente
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-		// TODO Auto-generated method stub
-		super.configure(security);
+		security.tokenKeyAccess("permitAll()")
+		.checkTokenAccess("isAuthenticated()");
 	}
-
+	
+	//Configuura los clientes que utilizaran a nuestro Backend, cada cliente debe registrarse con el 
+	//Id y su contraseña, generando mayor seguridad ya que se establece quién ingresará a la información
+	//dnado doble seguridad, una de la app y otra del cliente que va a ingresar
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		// TODO Auto-generated method stub
-		super.configure(clients);
+		//Se registran los clientes en memoria, con el nombre y contraseña de la app
+		//en scopes se indican los procesos que puede llevar a cabo (leer/escribir)
+		//en authorizedGrantTypes se establece cómo vamos a obtener el Token pueden ser
+		// -> Password indica el logeo de la app y del usuario
+		// -> AuthorizationCode sirve para autenticar las applicaciones, solicitando
+		//		BackEnd el TOKEN para el registro de la APP (TIPO AFIP)
+		// -> Implicit autenticación del cliente mucho más debil es como AuthorizationCode 
+		//		pero solo se envía el clienteID y el password y se recibe el TOKEN sin
+		//		verificación. Se usa para aplicaciones públicas
+		clients.inMemory().withClient("nombreAppFrontend")
+				.secret(passwordEncoder.encode("contraseñaApp"))
+				.scopes("read", "write")
+				.authorizedGrantTypes("password", "refresh_token")//refresh renueva el token cuando se vence
+				.accessTokenValiditySeconds(3600) //cada una hora se vence el token
+				.refreshTokenValiditySeconds(3600); //se renueva por una hora más
+			/**
+			 poniendo un .and() se pueden anidar más clientes
+			 .and()
+			 .withClient("nombreAppFrontend2")
+				.secret(passwordEncoder.encode("contraseñaApp"))
+				.scopes("read", "write")
+				.authorizedGrantTypes("password", "refresh_token")
+				.accessTokenValiditySeconds(3600) 
+				.refreshTokenValiditySeconds(3600);
+			 * */
 	}
 
 	//Los endpoints están relacionados a los endpoints ("/oauth/token") de la librería OAuth2 que se encargan 
