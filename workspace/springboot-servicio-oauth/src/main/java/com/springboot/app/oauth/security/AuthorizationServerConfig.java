@@ -1,5 +1,7 @@
 package com.springboot.app.oauth.security;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +12,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
@@ -28,6 +31,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Autowired
 	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private InfoAdcionalToken infoAdicional;
 
 	//Configura el permiso y la seguridad que van a tener nuestros endpoints de OAuth2
 	//tokenKeyAccess se encarga de validar las credenciales que se envían al OAuth2 la idea
@@ -77,13 +83,18 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 		
+		//Para unir al AccessToken con la información adicional tenemos que utilizar TokenEnhancerChain
+		TokenEnhancerChain tokenEnhancer = new TokenEnhancerChain();
+		tokenEnhancer.setTokenEnhancers(Arrays.asList(infoAdicional, accessTokenConverter()));
+		
 		//Configuramos el AuthenticationManager en AuthorizationServerConfigurerAdapter 
 		//también el token de tipo JWT y el AccesTokenCorverter que se encarga de guardar
 		//los datos del usuario en el token. Encargándose de tomar estos datos y convertirlo
 		//en el token, codificados en base64
 		endpoints.authenticationManager(authenticationManager)
 			.tokenStore(tokenStore())
-			.accessTokenConverter(accessTokenConverter());
+			.accessTokenConverter(accessTokenConverter())
+			.tokenEnhancer(tokenEnhancer);
 	}
 	
 	//Se encarga de crear y  guardar el Token a partir de la configuración de JwtAccessTokenConverter

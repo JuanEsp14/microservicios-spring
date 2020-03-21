@@ -23,7 +23,7 @@ import com.springboot.app.oauth.clients.UsuarioFeignClient;
 
 //Esta clase debe configurase porque se va a marcar toda la configuración de Spring Security
 @Service
-public class UsuarioService implements UserDetailsService{
+public class UsuarioService implements IUsuarioService, UserDetailsService{
 	
 	private Logger log = LoggerFactory.getLogger(UsuarioService.class);
 
@@ -48,6 +48,18 @@ public class UsuarioService implements UserDetailsService{
 		log.info("Usuario autenticado: "+username);
 		
 		return new User(usuario.getUsername(), usuario.getPassword(), usuario.getEnabled(), true, true, true, authorities);
+	}
+
+	@Override
+	public Usuario findByUsername(String username) {
+		Usuario usuario = client.findByUsername(username);
+		
+		if(usuario == null) {
+			log.error("Error en el login, no existe el usuario '"+username+"' en el sistema");
+			throw new UsernameNotFoundException("Error en el login, no existe el usuario '"+username+"' en el sistema");
+		}
+		
+		return usuario;
 	}
 
 }
