@@ -1,5 +1,7 @@
 package com.springboot.app.zuul.oauth;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,16 +12,25 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
+//Se crea el Bean de configuracion
+@Configuration
+
 //ResourceServer se encargará de proteger todos los recursos 
 //todos los accesos a los microservicios, y darle acceso a los mismos
 //a través dle token enviado en las cabeceras. Es el que valida que el token
 //sea válido y con la misma firma. 
 //Se tienen que implementar dos métodos una para asegurar nuestras rutas
 //y otro para configurar el token
-@Configuration
 @EnableResourceServer
+
+//Se  inyecta Actuator para refrescardinámicamente las properties
+@RefreshScope
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
+	//Al ser una sola propiedad la inyecto con @Value
+	@Value("${config.security.oauth.jwt.key}")
+	private String jwtKey;
+	
 	// Configuración del TOKEN
 	@Override
 	public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
@@ -74,7 +85,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		JwtAccessTokenConverter tokenConverter = new JwtAccessTokenConverter();
 
 		// Firmamos el token con el mismo código secreto
-		tokenConverter.setSigningKey("algun_codigo_secreto_aeiou");
+		tokenConverter.setSigningKey(this.jwtKey);
 		return tokenConverter;
 	}
 

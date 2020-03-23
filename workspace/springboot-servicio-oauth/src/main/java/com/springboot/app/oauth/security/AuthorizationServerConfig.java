@@ -3,8 +3,10 @@ package com.springboot.app.oauth.security;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -21,6 +23,9 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 @Configuration
 @EnableAuthorizationServer
+
+//Se  inyecta Actuator para refrescardinámicamente las properties
+@RefreshScope
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
 	//AuthorizationServerConfigurerAdapter necesita la inyección de dos atributos
@@ -34,6 +39,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Autowired
 	private InfoAdcionalToken infoAdicional;
+	
+	//Se inyectan los Enviroment para leer las propiedades del archivo application.properties
+	@Autowired
+	private Environment env;
 
 	//Configura el permiso y la seguridad que van a tener nuestros endpoints de OAuth2
 	//tokenKeyAccess se encarga de validar las credenciales que se envían al OAuth2 la idea
@@ -60,8 +69,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		// -> Implicit autenticación del cliente mucho más debil es como AuthorizationCode 
 		//		pero solo se envía el clienteID y el password y se recibe el TOKEN sin
 		//		verificación. Se usa para aplicaciones públicas
-		clients.inMemory().withClient("nombreAppFrontend")
-				.secret(passwordEncoder.encode("contraseñaApp"))
+		clients.inMemory().withClient(env.getProperty("config.security.oauth.client.id"))
+				.secret(passwordEncoder.encode(env.getProperty("config.security.oauth.client.security")))
 				.scopes("read", "write")
 				.authorizedGrantTypes("password", "refresh_token")//refresh renueva el token cuando se vence
 				.accessTokenValiditySeconds(3600) //cada una hora se vence el token
@@ -108,7 +117,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		JwtAccessTokenConverter tokenConverter = new JwtAccessTokenConverter();
 		
 		//Firmamos el token con un código secreto
-		tokenConverter.setSigningKey("algun_codigo_secreto_aeiou");
+		tokenConverter.setSigningKey(env.getProperty("config.security.oauth.jwt.key"));
 		return tokenConverter;
 	}
 	
