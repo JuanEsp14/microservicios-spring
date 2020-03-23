@@ -1,5 +1,7 @@
 package com.springboot.app.zuul.oauth;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +28,8 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 //Se  inyecta Actuator para refrescardinámicamente las properties
 @RefreshScope
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
+	
+	private static Logger log = LoggerFactory.getLogger(ResourceServerConfig.class);
 
 	//Al ser una sola propiedad la inyecto con @Value
 	@Value("${config.security.oauth.jwt.key}")
@@ -85,7 +89,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		JwtAccessTokenConverter tokenConverter = new JwtAccessTokenConverter();
 
 		// Firmamos el token con el mismo código secreto
-		tokenConverter.setSigningKey(this.jwtKey);
+		log.info("Porpiedades clave: "+jwtKey);
+		tokenConverter.setSigningKey(jwtKey);
 		return tokenConverter;
 	}
 

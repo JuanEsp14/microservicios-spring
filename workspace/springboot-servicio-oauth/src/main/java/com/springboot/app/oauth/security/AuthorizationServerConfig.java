@@ -2,6 +2,8 @@ package com.springboot.app.oauth.security;
 
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +29,8 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 //Se  inyecta Actuator para refrescardinámicamente las properties
 @RefreshScope
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+	
+	private static Logger log = LoggerFactory.getLogger(AuthorizationServerConfig.class);
 
 	//AuthorizationServerConfigurerAdapter necesita la inyección de dos atributos
 	//el BCryptPasswordEncoder y el AuthenticationManager, donde este último tiene
@@ -69,8 +73,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		// -> Implicit autenticación del cliente mucho más debil es como AuthorizationCode 
 		//		pero solo se envía el clienteID y el password y se recibe el TOKEN sin
 		//		verificación. Se usa para aplicaciones públicas
+		log.info("Porpiedades id: "+env.getProperty("config.security.oauth.client.id"));
+		log.info("Porpiedades pass: "+env.getProperty("config.security.oauth.client.secret"));
 		clients.inMemory().withClient(env.getProperty("config.security.oauth.client.id"))
-				.secret(passwordEncoder.encode(env.getProperty("config.security.oauth.client.security")))
+				.secret(passwordEncoder.encode(env.getProperty("config.security.oauth.client.secret")))
 				.scopes("read", "write")
 				.authorizedGrantTypes("password", "refresh_token")//refresh renueva el token cuando se vence
 				.accessTokenValiditySeconds(3600) //cada una hora se vence el token
@@ -115,7 +121,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Bean
 	public JwtAccessTokenConverter accessTokenConverter() {
 		JwtAccessTokenConverter tokenConverter = new JwtAccessTokenConverter();
-		
+		log.info("Porpiedades clave: "+env.getProperty("config.security.oauth.jwt.key"));
 		//Firmamos el token con un código secreto
 		tokenConverter.setSigningKey(env.getProperty("config.security.oauth.jwt.key"));
 		return tokenConverter;
