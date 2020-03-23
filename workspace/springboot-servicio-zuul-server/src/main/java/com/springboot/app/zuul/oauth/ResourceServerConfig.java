@@ -1,11 +1,15 @@
 package com.springboot.app.zuul.oauth;
 
+import java.util.Arrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -13,6 +17,10 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 //Se crea el Bean de configuracion
 @Configuration
@@ -60,7 +68,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 											"/api/items/ver/{id}/cantidad/{cantidad}", 
 											"/api/usuarios/usuarios/{id}").hasAnyRole("ADMIN", "USER")
 				.antMatchers("/api/productos/**", "/api/items/**", "/api/usuarios/**").hasRole("ADMIN")
-				.anyRequest().authenticated();
+				.anyRequest().authenticated()
+				.and().cors().configurationSource(corsConfigurationSource());
 		/** ES LO MISMO QUE EL ANTERIOR PERO NO DE FORMA GENÉRICA, SE PUEDE DETALLAR MÁS CONTROL
 		 * EL CRUD SOLO LO HACE EL ADMIN
 		 .antMatchers(HttpMethod.POST, "/api/productos/crear", 
@@ -75,6 +84,43 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		 **/
 		
 		
+	}
+
+	//Configuramos el CORS de las rutas
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration corsConfig = new CorsConfiguration();
+		
+		//Configuramos las aplicaciones clientes, con el nombre de dominio y el puerto
+		//Al configrar con * se le da acceso a cualquier dominio que ingrese
+		corsConfig.setAllowedOrigins(Arrays.asList("*"));
+		
+		//Configuramos los métodos HTTP POST, GET, etc.
+		corsConfig.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "OPTIONS"));
+		
+		//
+		corsConfig.setAllowCredentials(true);
+		
+		//Configuramos las cabeceras. Authorization es importante para enviar el Token
+		corsConfig.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+		
+		//Pasamos esta configuración a las rutas configuradas previamente
+		//Fijarse de qué clase se importa
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		//Se aplciará a todas las rutas configuradas
+		source.registerCorsConfiguration("/**", corsConfig);
+		
+		return source;
+	}
+	
+	//Se registra un filtro de CORS para que quede configurado no solo en Spring Security
+	//sino a nivel global
+	@Bean
+	public FilterRegistrationBean<CorsFilter> corsFilter(){
+		FilterRegistrationBean<CorsFilter> bean =  new FilterRegistrationBean<CorsFilter>(new CorsFilter(corsConfigurationSource()));
+		//Prioridad Alta
+		bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		return bean;
 	}
 
 	// Se encarga de crear y guardar el Token a partir de la configuración de
