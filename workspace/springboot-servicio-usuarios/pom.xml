@@ -65,6 +65,11 @@
 			<artifactId>springboot-servicio-usuarios-commons</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
