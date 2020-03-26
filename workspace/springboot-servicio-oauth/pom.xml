@@ -71,6 +71,19 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
 		</dependency>
+		
+		<!-- Sleuth nos ayuda a rastrear como viaja el request a través 
+			de la aplciación y permite sacar estadísticas de estos 
+			registros.
+			Un TraceID es para rastrear el request a través de los 
+			mircroservicios. Representa	todo el recorrido de una 
+			petición a través de los distintos microservicios
+			SpanId es para el seguimineto dentro del microservicio, 
+			de forma individual -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
