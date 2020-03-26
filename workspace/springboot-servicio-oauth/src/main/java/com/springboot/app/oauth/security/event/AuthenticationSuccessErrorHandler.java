@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.springboot.app.commons.usuarios.models.entity.Usuario;
 import com.springboot.app.oauth.services.IUsuarioService;
 
+import brave.Tracer;
 import feign.FeignException;
 
 //Se manejaran los eventos de éxito y de error al loguearse y se lanzará un evento
@@ -23,6 +24,9 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 	//Inyectamos el servicio de usuario
 	@Autowired
 	private IUsuarioService usuarioService;	
+	
+	@Autowired
+	private Tracer tracer;
 	
 	@Override
 	public void publishAuthenticationSuccess(Authentication authentication) {
@@ -41,11 +45,13 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 
 	@Override
 	public void publishAuthenticationFailure(AuthenticationException exception, Authentication authentication) {
+		StringBuilder errors = new StringBuilder();
 		String mensaje = "Error en el Login: "+ exception.getMessage();
 		System.out.println(mensaje);
 		log.error(mensaje);		
+		errors.append(mensaje);
 		
-		try {
+		try {			
 			Usuario usuario = this.usuarioService.findByUsername(authentication.getName());	
 			if(usuario.getIntentos() == null){
 				usuario.setIntentos(0);
@@ -56,14 +62,20 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 			}	
 			
 			log.info("Intento actual es de "+ usuario.getIntentos());
-			
+
 			usuario.setIntentos(usuario.getIntentos()+1);			
 			
 			this.usuarioService.update(usuario, usuario.getId());
 			
-			log.info("Intento después es de "+ usuario.getIntentos());
+			log.info("Intento despues del login "+ usuario.getIntentos());
+			
+			errors.append(" - Intento del login "+ usuario.getIntentos());
+			
+			tracer.currentSpan().tag("error.mensaje", errors.toString());
 		}catch (FeignException e){
-			log.error(String.format("El usuario %s no existe en el sistema", authentication.getName()));	
+			String errorMax = String.format("El usuario %s no existe en el sistema", authentication.getName());
+			errors.append(" - "+errorMax);
+			log.error(errorMax);	
 		}
 	}
 
