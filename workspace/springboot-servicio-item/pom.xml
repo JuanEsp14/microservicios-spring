@@ -105,10 +105,18 @@
 			mircroservicios. Representa	todo el recorrido de una 
 			petición a través de los distintos microservicios
 			SpanId es para el seguimineto dentro del microservicio, 
-			de forma individual -->
+			de forma individual 
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
+		
+		Zipkin abraza Sleuth y trabajan en conjunto. Hace que nuestro 
+		microservcio exporte la traza completa. Donde se podrán buscar 
+		mediante los nombres, parámetros, anotaciones, duración, tiempo -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-zipkin</artifactId>
 		</dependency>
 	</dependencies>
 
